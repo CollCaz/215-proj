@@ -1,13 +1,9 @@
-#include "raylib.h"
-#include <iostream>
-#include <ostream>
-#include <raylib-cpp.hpp>
-#include <string>
 #include "Gates.hpp"
 #include "Globals.hpp"
+#include <raylib-cpp.hpp>
+#include <string>
 
 using namespace ::std;
-
 
 int main() {
 
@@ -37,7 +33,6 @@ int main() {
     g2.Cycle();
 
     if (DraggingConnection && raylib::Mouse::IsButtonReleased(1)) {
-      cout << "AAA" << endl;
       DraggingConnection = false;
     }
 

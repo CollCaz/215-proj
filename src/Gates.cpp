@@ -1,6 +1,5 @@
 #include "Gates.hpp"
 #include "Globals.hpp"
-#include <iostream>
 #include <raylib-cpp.hpp>
 #include <string>
 
