@@ -31,6 +31,7 @@ public:
 
   explicit Point();
 
+  void SetOutput(bool o);
   bool virtual Solve();
 
   void virtual Draw();
@@ -40,7 +41,7 @@ public:
 
   void DragToConnect();
 
-  void SetPosition(float x, float y);
+  void SetPosition(Vector2 v);
   void SetConnectedTo(Gate *g);
 
   void OffsetPosition(Vector2 off);
@@ -73,7 +74,7 @@ protected:
   Point *connection2;
 
 public:
-  Gate(Point *a, Point *b);
+  Gate();
 
   void ConnectToThis();
 
@@ -86,4 +87,8 @@ public:
   string Print();
 
   void Update() override;
+};
+
+class AndGate : public Gate {
+  bool Solve() override;
 };

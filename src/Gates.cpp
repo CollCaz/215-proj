@@ -3,12 +3,28 @@
 #include <raylib.h>
 #include <string>
 
-Point::Point(bool output, float xpos, float ypos, float(size))
-    : output(output), xpos(xpos), ypos(ypos), label(to_string(output)),
-      size(size), height(size), width(size), Draged(false), Held(false),
-      MouseOn(false), ConectedTo(nullptr) {}
+#include <iostream>
 
-Point::Point() : output(false), ConectedTo(nullptr) {}
+using namespace std;
+
+Point::Point() {
+  Vector2 mousePos = GetMousePosition();
+  this->xpos = mousePos.x;
+  this->ypos = mousePos.y;
+  this->label = to_string(output);
+  this->size = 20;
+  this->height = 20;
+  this->width = 20;
+  this->Draged = false;
+  this->Held = false;
+  this->MouseOn = false;
+  this->ConectedTo = nullptr;
+}
+
+void Point::SetOutput(bool o) {
+  this->output = o;
+  this->label = to_string(this->output);
+}
 
 bool Point::Solve() { return output; }
 
@@ -36,9 +52,9 @@ void Point::DragToConnect() {
 
 void Point::SetConnectedTo(Gate *g) { this->ConectedTo = g; }
 
-void Point::SetPosition(float x, float y) {
-  this->xpos = x - 20;
-  this->ypos = y - 20;
+void Point::SetPosition(Vector2 v) {
+  this->xpos = v.x - 20;
+  this->ypos = v.y - 20;
 }
 
 void Point::OffsetPosition(Vector2 off) {
@@ -96,7 +112,7 @@ void Point::HoldAndDrag() {
   }
 };
 
-Gate::Gate(Point *a, Point *b) {
+Gate::Gate() {
   Vector2 mousePos = GetMousePosition();
   this->xpos = mousePos.x;
   this->ypos = mousePos.y;
@@ -105,8 +121,6 @@ Gate::Gate(Point *a, Point *b) {
   this->MouseOn = false;
   this->Draged = false;
   this->Held = false;
-  this->inputs[0] = a->output;
-  this->inputs[1] = b->output;
   this->connection1 = nullptr;
   this->connection2 = nullptr;
 }
@@ -171,3 +185,11 @@ void Gate::Update() {
   ConnectToThis();
   Move();
 };
+
+// And Gate
+
+bool AndGate::Solve() {
+  bool solution = this->connection1->output && this->connection2->output;
+  cout << solution << endl;
+  return solution;
+}
