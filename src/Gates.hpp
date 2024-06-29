@@ -1,21 +1,21 @@
 #pragma once
 
-#include "Vector2.hpp"
-#include <raylib-cpp.hpp>
 #include <string>
+
+#include <raylib.h>
 
 using namespace std;
 
 class Gate;
 class Point {
 private:
-  string label;
   float size;
 
 protected:
+  string label;
   bool Draged;
-  raylib::Vector2 lineFrom;
-  raylib::Vector2 lineTo;
+  Vector2 lineFrom;
+  Vector2 lineTo;
   Gate *ConectedTo;
   bool MouseOn;
   bool Held;
@@ -31,11 +31,11 @@ public:
 
   explicit Point();
 
-  bool Solve();
+  bool virtual Solve();
 
-  void Draw();
+  void virtual Draw();
 
-  void SetLineTo(raylib::Vector2 to);
+  void SetLineTo(Vector2 to);
   void SetDragged(bool d);
 
   void DragToConnect();
@@ -43,9 +43,9 @@ public:
   void SetPosition(float x, float y);
   void SetConnectedTo(Gate *g);
 
-  void OffsetPosition(raylib::Vector2 off);
+  void OffsetPosition(Vector2 off);
 
-  void OffsetLineTo(raylib::Vector2 off);
+  void OffsetLineTo(Vector2 off);
 
   void Move();
 
@@ -53,12 +53,11 @@ public:
 
   void HoldAndDrag();
 
-  void Cycle() {
+  void virtual Update() {
     CheckMouse();
     Move();
     HoldAndDrag();
     DragToConnect();
-    Draw();
   }
 };
 
@@ -67,22 +66,24 @@ class Gate : public Point {
   bool output;
 
 protected:
-  raylib::Rectangle rec;
-  raylib::Vector2 connectPos1;
-  raylib::Vector2 connectPos2;
+  Rectangle rec;
+  Vector2 connectPos1;
+  Vector2 connectPos2;
   Point *connection1;
   Point *connection2;
 
 public:
   Gate(Point *a, Point *b);
 
-  void Connect();
+  void ConnectToThis();
 
   void RemoveConnection(Point *p);
 
   void Move();
 
-  void Draw();
+  void Draw() override;
 
-  void Cycle();
+  string Print();
+
+  void Update() override;
 };

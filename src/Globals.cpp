@@ -1,6 +1,10 @@
 #include "Globals.hpp"
+#include "Gates.hpp"
 #include "raylib.h"
+#include <vector>
 
-raylib::Color color = raylib::Color(LIGHTGRAY);
-Point* BeingDragged = nullptr;
+Color color = LIGHTGRAY;
+Point *BeingDragged = nullptr;
 bool DraggingConnection = false;
+vector<Point *> Objects;
+vector<Gate *> Gates;

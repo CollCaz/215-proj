@@ -1,9 +1,7 @@
 #include "Gates.hpp"
 #include "Globals.hpp"
-#include <raylib-cpp.hpp>
+#include <raylib.h>
 #include <string>
-
-using namespace std;
 
 Point::Point(bool output, float xpos, float ypos, float(size))
     : output(output), xpos(xpos), ypos(ypos), label(to_string(output)),
@@ -15,12 +13,12 @@ Point::Point() : output(false), ConectedTo(nullptr) {}
 bool Point::Solve() { return output; }
 
 void Point::Draw() {
-  lineFrom = raylib::Vector2(this->xpos, this->ypos);
-  lineFrom.DrawLine(lineTo, 4, color);
-  color.DrawText(this->label, xpos, ypos, 20);
+  lineFrom = Vector2{this->xpos, this->ypos};
+  DrawLineEx(lineFrom, lineTo, 2, color);
+  DrawText(this->label.c_str(), xpos, ypos, 20, color);
 }
 
-void Point::SetLineTo(raylib::Vector2 to) { this->lineTo = to; }
+void Point::SetLineTo(Vector2 to) { this->lineTo = to; }
 void Point::SetDragged(bool d) { this->Draged = d; }
 
 void Point::DragToConnect() {
@@ -29,7 +27,7 @@ void Point::DragToConnect() {
     this->ConectedTo = nullptr;
   }
   if (this->Draged && DraggingConnection) {
-    this->lineTo = raylib::Mouse::GetPosition();
+    this->lineTo = GetMousePosition();
     BeingDragged = this;
   } else if (BeingDragged == this) {
     BeingDragged = nullptr;
@@ -43,25 +41,24 @@ void Point::SetPosition(float x, float y) {
   this->ypos = y - 20;
 }
 
-void Point::OffsetPosition(raylib::Vector2 off) {
+void Point::OffsetPosition(Vector2 off) {
   this->xpos += off.x;
   this->ypos += off.y;
 }
 
-void Point::OffsetLineTo(raylib::Vector2 off) {
+void Point::OffsetLineTo(Vector2 off) {
   this->lineTo.x += off.x;
   this->lineTo.y += off.y;
 }
 
 void Point::Move() {
   if (Held) {
-    Vector2 mousePos = raylib::Mouse::GetPosition();
-    OffsetPosition(raylib::Mouse::GetDelta());
+    OffsetPosition(GetMouseDelta());
   }
 }
 
 void Point::CheckMouse() {
-  Vector2 mousePos = raylib::Mouse::GetPosition();
+  Vector2 mousePos = GetMousePosition();
   if (mousePos.x >= this->xpos && mousePos.x <= this->xpos + this->width &&
       mousePos.y >= this->ypos && mousePos.y <= this->ypos + this->height) {
     this->MouseOn = true;
@@ -71,14 +68,14 @@ void Point::CheckMouse() {
 }
 
 void Point::HoldAndDrag() {
-  if (raylib::Mouse::IsButtonUp(0)) {
+  if (IsMouseButtonUp(0)) {
     this->Held = false;
   }
 
-  if (raylib::Mouse::IsButtonUp(1)) {
+  if (IsMouseButtonUp(1)) {
     this->Draged = false;
     if (!this->ConectedTo) {
-      SetLineTo(raylib::Vector2(this->xpos, this->ypos));
+      SetLineTo(Vector2{this->xpos, this->ypos});
     }
     DraggingConnection = false;
     BeingDragged = nullptr;
@@ -89,10 +86,10 @@ void Point::HoldAndDrag() {
     return;
   }
 
-  if (raylib::Mouse::IsButtonPressed(0)) {
+  if (IsMouseButtonPressed(0)) {
     this->Held = true;
   }
-  if (raylib::Mouse::IsButtonPressed(1)) {
+  if (IsMouseButtonPressed(1)) {
     this->Draged = true;
     BeingDragged = this;
     DraggingConnection = true;
@@ -114,7 +111,7 @@ Gate::Gate(Point *a, Point *b) {
   this->connection2 = nullptr;
 }
 
-void Gate::Connect() {
+void Gate::ConnectToThis() {
   if (BeingDragged == this) {
     return;
   }
@@ -142,7 +139,7 @@ void Gate::RemoveConnection(Point *p) {
 
 void Gate::Move() {
   if (Held) {
-    Vector2 mouseDelta = raylib::Mouse::GetDelta();
+    Vector2 mouseDelta = GetMouseDelta();
     OffsetPosition(mouseDelta);
     if (this->connection1) {
       this->connection1->OffsetLineTo(mouseDelta);
@@ -154,22 +151,23 @@ void Gate::Move() {
 }
 
 void Gate::Draw() {
-  lineFrom = raylib::Vector2(this->xpos + this->width,
-                             this->ypos + (this->height / 2.0));
-  lineFrom.DrawLine(lineTo, 4, color);
-  rec.SetSize(this->height, this->width);
-  rec.SetPosition(this->xpos, this->ypos);
-  rec.Draw(color);
+  lineFrom = Vector2{this->xpos + this->width, this->ypos + (this->height / 2)};
+  DrawLineEx(this->lineFrom, this->lineTo, 4, color);
+  rec.height = this->height;
+  rec.width = this->width;
+  rec.x = this->xpos;
+  rec.y = this->ypos;
+  DrawRectangleRec(rec, color);
 }
 
-void Gate::Cycle() {
-  this->connectPos1 = raylib::Vector2(this->xpos, this->ypos + 10);
-  this->connectPos2 = raylib::Vector2(this->xpos, this->ypos + 40);
+string Gate::Print() { return "Gate"; }
+
+void Gate::Update() {
+  this->connectPos1 = Vector2{this->xpos, this->ypos + 10};
+  this->connectPos2 = Vector2{this->xpos, this->ypos + 40};
   CheckMouse();
   HoldAndDrag();
   DragToConnect();
-  Connect();
+  ConnectToThis();
   Move();
-
-  Draw();
 };
